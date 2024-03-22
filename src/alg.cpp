@@ -1,48 +1,60 @@
 // Copyright 2021 NNTU-CS
-int countPairs1(int* arr, int len, int value) {
-    int res = 0;
-    for (int i = 0; i < len - 1; i++)
-        for (int j = i + 1; j < len; j++)
+int countPairs1(int* arr, int size, int value) {
+    int count = 0;
+    for (int i = 0; i < size - 1; i++)
+        for (int j = i + 1; j < size; j++)
             if ((arr[i] + arr[j]) == value)
-                res += 1;
-    return res;
+                count += 1;
+    return count;
 }
-int countPairs2(int* arr, int len, int value) {
-    int res = 0;
-    for (int i = 0; i < len - 1; i++) {
+int countPairs2(int* arr, int size, int value) {
+    int count = 0;
+    for (int i = 0; i < size - 1; i++) {
         if (arr[i] > value)
             continue;
-        for (int j = len - 1; j > i; j--) {
+        for (int j = size - 1; j > i; j--) {
             if (arr[j] > value)
                 continue;
             if ((arr[i] + arr[j]) == value)
-                res += 1;
+                count += 1;
         }
     }
-    return res;
+    return count;
 }
-int countPairs3(int* arr, int size, int value) {
+int cbinsearch(int* arr, int size, int value) {
     int count = 0;
-    for (int i = 0; i < size - 1; i++) {
-        int left = i;
-        int right = size;
-        while (left < right - 1) {
-            int mid = (right + left) / 2;
-            if (arr[i] + arr[mid] == value) {
+    int left = 0;
+    int right = size - 1;
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        if (arr[mid] == value) {
+            count++;
+            int left = mid - 1;
+            int right = mid + 1;
+            while (left >= 0 && arr[left] == value) {
                 count++;
-                int j = mid + 1;
-                while ((arr[i] + arr[j] == value) && (j < right)) {
-                    count++;
-                    j++;
-                }
+                left--;
             }
-            if (arr[i] + arr[mid] < value) {
-                left = mid;
+            while (right < size && arr[right] == value) {
+                count++;
+                right++;
             }
-            else {
-                right = mid;
-            }
+            return count;
         }
+        if (arr[mid] < value) {
+            left = mid + 1;
+        }
+        else {
+            right = mid - 1;
+        }
+    }
+    return count;
+}
+int countPairs3(int* arr, int len, int value) {
+    int count = 0;
+    for (int i = 0; i < len; i++) {
+        int second = value - arr[i];
+        count += cbinsearch(&arr[i + 1], len - i - 1, second);
     }
     return count;
 }
